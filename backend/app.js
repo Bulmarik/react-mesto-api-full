@@ -10,6 +10,7 @@ const {
   createUser, login,
 } = require('./controllers/users');
 const errorHandler = require('./middlewares/errorHandler');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const app = express();
 
@@ -21,9 +22,11 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 });
 
 app.use(express.json());
+app.use(requestLogger);
 app.post('/signin', validLogin, login);
 app.post('/signup', validCreateUser, createUser);
 app.use(router);
+app.use(errorLogger);
 app.use(errors());
 app.use(errorHandler);
 app.listen(PORT);
