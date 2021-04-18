@@ -1,0 +1,15 @@
+.elements__item {
+    width: 282px;
+    border-radius: 10px;
+    background-color: #111111;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+@media screen and (max-width: 638px) {
+    .elements__item {
+        justify-self: center;
+    }
+}

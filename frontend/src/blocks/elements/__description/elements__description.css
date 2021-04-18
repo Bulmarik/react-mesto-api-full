@@ -1,0 +1,6 @@
+.elements__description {
+    display: flex;
+    justify-content: space-between;
+    background-color: #ffffff;
+    color: #000000;
+}
