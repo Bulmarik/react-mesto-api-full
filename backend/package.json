@@ -1,7 +1,7 @@
 {
   "name": "express-mesto",
   "author": "Marat Bulatov",
-  "homepage": "https://github.com/Bulmarik/express-mesto#readme",
+  "homepage": "https://bulmarik.nomoredomains.club",
   "version": "1.0.0",
   "description": "`/routes` — папка с файлами роутера  \r `/controllers` — папка с файлами контроллеров пользователя и карточки   \r `/models` — папка с файлами описания схем пользователя и карточки",
   "main": "index.js",
@@ -9,6 +9,7 @@
     "start": "node app.js",
     "dev": "nodemon app.js",
     "lint": "npx eslint .",
+    "deploy": "scp -r ../backend/* bulmarik@178.154.200.201:/home/bulmarik/express-mesto",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -22,6 +23,7 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "celebrate": "^14.0.0",
+    "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-winston": "^4.1.0",

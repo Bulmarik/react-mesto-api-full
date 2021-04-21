@@ -14,3 +14,5 @@
 При созданий базы данных использовалась MongoDB.  
 
 [Посмотреть проект](https://bulmarik.nomoredomains.club)
+
+IP-адрес и URL сервера: 178.154.200.201 (api.bulmarik.nomoredomains.icu)

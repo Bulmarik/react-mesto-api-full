@@ -30,9 +30,10 @@ export default function App() {
   const [selectedCard, setSelectedCard] = React.useState(false);
   const [cards, setCards] = React.useState([]);
   const [currentUser, setCurrentUser] = React.useState({});
-  const [loggedIn, setLoggedIn] = React.useState(false)
-  const [headerEmail, setHeaderEmail] = React.useState("");
+  const [loggedIn, setLoggedIn] = React.useState(false);
+  const [headerEmail, setHeaderEmail] = React.useState('');
   const [infoTool, setInfoTool] = React.useState({message: '', icon: ''});
+  const [token, setToken] = React.useState('');
 
   //// ПРОМИСЫ
   // вход в учётную запись
@@ -45,15 +46,16 @@ export default function App() {
       .then((res) => {
         if (res.token){
           data.setInputValue({email: '', password: ''});
+          setToken(res.token);
+          setCurrentUser(res);
+          setHeaderEmail(res.email);
           setLoggedIn(true);
           history.push('/');
-          setHeaderEmail(email);
         }
       })
-      .catch((res) => {
-        console.log(`Ошибка: ${res.status}`);
+      .catch(() => {
         handleInfoTooltip({
-          message: 'Неверный логин или пароль!',
+          message: 'Неверный email или пароль!',
           icon: fail
         });
       })
@@ -69,13 +71,75 @@ export default function App() {
             message: 'Вы успешно зарегистрировались!',
             icon: success
           });
-          history.push('/sign-in');
+          history.push('/signin');
         } else {
           handleInfoTooltip({
-            message: 'Что-то пошло не так! Попробуйте ещё раз',
+            message: 'Некорректный (или уже занятый) email или слишком короткий пароль',
             icon: fail
           })
         }
+      })
+      .catch((res) => {
+        console.log(`Ошибка: ${res.status}`);
+      })
+  }
+  
+  // обновление аватара
+  function handleUpdateAvatar(data) {
+    api.setAvatar(data, token)
+      .then ((res) => {
+        setCurrentUser(res);
+        closeAllPopups();
+      })
+      .catch((res) => {
+        console.log(`Ошибка: ${res.status}`);
+      })
+  }
+
+  // обновление инфо пользователя
+  function handleUpdateUser(data) {
+    api.setUser(data.name, data.about, token)
+      .then((res) => {
+        setCurrentUser(res);
+        closeAllPopups();
+      })
+      .catch((res) => {
+        console.log(`Ошибка: ${res.status}`);
+      })
+  }
+
+  // добавление новых карточек
+  function handleAddPlaceSubmit(data) {
+    api.addNewCard(data, token)
+      .then((res) => {
+        setCards([res, ...cards]);
+        closeAllPopups();
+      })
+      .catch((res) => {
+        console.log(`Ошибка: ${res.status}`);
+      })
+  }
+
+  // удаление карточек
+  function handleCardDelete(card) {
+    api.delCard(card._id, token)
+      .then(() => {
+        const newList = cards.filter((c) => c._id !== card._id);
+        setCards(newList);
+        closeAllPopups();
+      })
+      .catch((res) => {
+        console.log(`Ошибка: ${res.status}`);
+      })
+  }
+    
+  // лайки карточек
+  function handleCardLike(card) {
+    const isLiked = card.likes.some(like => like === currentUser._id);
+    api.changeLikeCardStatus(card._id, !isLiked, token)
+      .then((newCard) => {
+        const newCards = cards.map((c) => c._id === card._id ? newCard : c);
+        setCards(newCards)
       })
       .catch((res) => {
         console.log(`Ошибка: ${res.status}`);
@@ -89,9 +153,10 @@ export default function App() {
       auth.getContent(jwt)
         .then((res) => {
           if (res) {
+            setToken(jwt);
             setLoggedIn(true);
             history.push("/");
-            setHeaderEmail(res.data.email);
+            setHeaderEmail(res.email);
           }
         })
         .catch((res) => {
@@ -99,24 +164,12 @@ export default function App() {
         })
     }
   }, [history])
-
-  // начальные карточки
-  React.useEffect(() => {
-    if(loggedIn) {
-      api.getInitialCards()
-        .then((initialCards) => {
-          setCards(initialCards)
-        })
-        .catch((res) => {
-          console.log(`Ошибка: ${res.status}`);
-        })
-    }
-  }, [loggedIn])
-
+  
   // инфо пользователя
   React.useEffect(() => {
+    const jwt = localStorage.getItem('jwt');
     if(loggedIn) {
-      api.getUser()
+      api.getUser(jwt)
         .then((res) => {
           setCurrentUser(res);
         })
@@ -125,75 +178,28 @@ export default function App() {
         })
     }
   }, [loggedIn])
-
-  // обновление аватара
-  function handleUpdateAvatar(data) {
-    api.setAvatar(data)
-      .then ((res) => {
-        setCurrentUser(res);
-        closeAllPopups();
-      })
-      .catch((res) => {
-        console.log(`Ошибка: ${res.status}`);
-      })
-  }
-
-  // обновление инфо пользователя
-  function handleUpdateUser(data) {
-    api.setUser(data.name, data.about)
-      .then((res) => {
-        setCurrentUser(res);
-        closeAllPopups();
-      })
-      .catch((res) => {
-        console.log(`Ошибка: ${res.status}`);
-      })
-  }
-
-  // добавление новых карточек
-  function handleAddPlaceSubmit(data) {
-    api.addNewCard(data)
-      .then((res) => {
-        setCards([res, ...cards]);
-        closeAllPopups();
-      })
-      .catch((res) => {
-        console.log(`Ошибка: ${res.status}`);
-      })
-  }
-
-  // удаление карточек
-  function handleCardDelete(card) {
-    api.delCard(card._id)
-      .then(() => {
-        const newList = cards.filter((c) => c._id !== card._id);
-        setCards(newList);
-        closeAllPopups();
-      })
-      .catch((res) => {
-        console.log(`Ошибка: ${res.status}`);
-      })
+      
+    
+  // начальные карточки
+  React.useEffect(() => {
+    const jwt = localStorage.getItem('jwt');
+    if(loggedIn) {
+      api.getInitialCards(jwt)
+        .then((initialCards) => {
+          setCards(initialCards.reverse())
+        })
+        .catch((res) => {
+          console.log(`Ошибка: ${res.status}`);
+        })
     }
-
-  // лайки карточек
-  function handleCardLike(card) {
-    const isLiked = card.likes.some(like => like._id === currentUser._id);
-    api.changeLikeCardStatus(card._id, !isLiked)
-      .then((newCard) => {
-        const newCards = cards.map((c) => c._id === card._id ? newCard : c);
-        setCards(newCards)
-      })
-      .catch((res) => {
-        console.log(`Ошибка: ${res.status}`);
-      })
-  }
-
+  }, [loggedIn])
+    
   //// ОБРАБОТЧИКИ
   // открытие попапа редактирования аватара
   function handleEditAvatarClick() {
     setIsEditAvatarPopupOpen(true);
   }
-
+  
   // открытие попапа редактирования инфо пользователя
   function handleEditProfileClick() {
     setIsEditProfilePopupOpen(true);
@@ -203,7 +209,7 @@ export default function App() {
   function handleAddPlaceClick() {
     setIsAddPlacePopupOpen(true);
   }
-
+  
   // открытие попапа просмотра карточек
   function handleCardClick(card) {
     setSelectedCard(card);
@@ -213,7 +219,7 @@ export default function App() {
   function handleRemovePlaceClick(card) {
     setIsRemovePlacePopupOpen(card);
   }
-
+  
   // открытие попапа отчета о регистрации новой учетной записи
   function handleInfoTooltip(data) {
     setIsInfoTooltipOpen(true);
@@ -230,11 +236,32 @@ export default function App() {
     setIsInfoTooltipOpen(false);
   }
 
+  // закрытие по ESC
+  React.useEffect(() => {
+    const onKeypress = (evt) => {
+      if (evt.key === 'Escape') {
+        closeAllPopups()
+      }
+    }
+    document.addEventListener('keydown', onKeypress)
+    return () => {
+      document.removeEventListener('keydown', onKeypress)
+    }
+  }, [])
+
+  // выход из ученой записи
+  function handleSignOut() {
+    localStorage.removeItem('jwt');
+    history.push('/signin');
+    setToken('');
+  }
+
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <div>
         <Header
           email={headerEmail}
+          onSignOut={handleSignOut}
         />
 
         <Switch>
@@ -254,18 +281,18 @@ export default function App() {
           />
 
           {/* Вход */}
-          <Route path="/sign-in">
+          <Route path="/signin">
             <Login onLogin={handleLogin} />
           </Route>
 
           {/* Регистрация */}
-          <Route path="/sign-up">
+          <Route path="/signup">
             <Register onRegister={handleRegister} />
           </Route>
 
           {/* Перенаправление на Вход */}
           <Route>
-            {loggedIn ? (<Redirect to="/" />) : (<Redirect to="sign-in" />)}
+            {loggedIn ? (<Redirect to="/" />) : (<Redirect to="signin" />)}
           </Route>
         </Switch>
 
@@ -305,7 +332,7 @@ export default function App() {
           onClose={closeAllPopups}
         />
 
-        {/* Отчет о регистрации */}
+        {/* Инфо-попап */}
         <InfoTooltip
           isOpen={isInfoTooltipOpen}
           onClose={closeAllPopups}

@@ -1,4 +1,4 @@
-export const BASE_URL = 'https://auth.nomoreparties.co';
+export const BASE_URL = 'https://api.bulmarik.nomoredomains.icu';
 
 export const register = (password, email) => {
   return fetch(`${BASE_URL}/signup`, {
@@ -31,14 +31,13 @@ export const authorize = (password, email) => {
       return data;
     }
   })
-  .catch(err => console.log(err))
+  .catch(err => console.log(err))  
 };
 
 export const getContent = (token) => {
   return fetch(`${BASE_URL}/users/me`, {
     method: 'GET',
     headers: {
-      'Accept': 'application/json',
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`,
     }

@@ -29,7 +29,7 @@ function Register(props) {
           <input className="register__input register__input_type_password" onChange={handleChange} value={inputValue.password} name="password" placeholder="Пароль" type="password" maxLength="30" minLength="7" required />
           <span className="register__error" id="password-error" />
           <button className="register__submit-btn" type="submit">Зарегистрироваться</button>
-          <p className="register__question">Уже зарегистрированы? <Link to="/sign-in" className="register__link" src="">Войти</Link></p>
+          <p className="register__question">Уже зарегистрированы? <Link to="/signin" className="register__link" src="">Войти</Link></p>
         </form>
     </div>
   )

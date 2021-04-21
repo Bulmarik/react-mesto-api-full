@@ -31,7 +31,7 @@ export default function AddPlacePopup(props) {
       name='add-card'
       title='Новое место'
       button='Добавить'>
-        <input className="popup__input popup__input_type_place" value={place} onChange={inputPlace} name="place" maxLength="30" minLength="1" placeholder="Название" type="text" required />
+        <input className="popup__input popup__input_type_place" value={place} onChange={inputPlace} name="place" maxLength="30" minLength="2" placeholder="Название" type="text" required />
         <span className="popup__error" id="place-error" />
         <input className="popup__input popup__input_type_url" value={link} onChange={inputLink} name="card-url" placeholder="Ссылка на картинку" type="url" required />
         <span className="popup__error" id="card-url-error" />
