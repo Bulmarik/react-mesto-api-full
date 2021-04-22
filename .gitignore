@@ -1,0 +1,13 @@
+# dependencies
+node_modules
+
+# production
+build
+
+# logs
+*.log
+
+# misc
+.env
+.eslintcache
+.vscode
