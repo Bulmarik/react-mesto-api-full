@@ -86,7 +86,9 @@ const login = (req, res, next) => {
           if (!matched) {
             throw new Unauthorized('Неправильные email или пароль');
           }
-          const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'bolshoy-secret', { expiresIn: '7d' });
+          const token = jwt.sign({ _id: user._id },
+            NODE_ENV === 'production' ? JWT_SECRET : 'abracadabra',
+            { expiresIn: '7d' });
           return res.send(
             {
               name: user.name,
