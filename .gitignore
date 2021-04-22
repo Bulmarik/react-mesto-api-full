@@ -8,7 +8,6 @@ build
 *.log
 
 # misc
-.editorconfig
 .env
 .eslintcache
 .vscode
