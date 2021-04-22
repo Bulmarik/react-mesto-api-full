@@ -15,14 +15,14 @@ const validCreateUser = celebrate({
       }),
     avatar: Joi.string()
       .custom((value, helpers) => {
-        if (validator.isURL(value)) {
+        if (validator.isURL(value, {require_protocol: true})) {
           return value;
         }
         return helpers.message('Некорректная ссылка');
       }),
     email: Joi.string().required()
       .custom((value, helpers) => {
-        if (validator.isEmail(value, {require_protocol: true})) {
+        if (validator.isEmail(value)) {
           return value;
         }
         return helpers.message('Некорректный email');
@@ -43,7 +43,7 @@ const validCreateCard = celebrate({
         'string.min': 'Минимум 2 символа',
         'string.max': 'Максимум 30 символов',
       }),
-    link: Joi.string()
+    link: Joi.string().required()
       .custom((value, helper) => {
         if (validator.isURL(value, {require_protocol: true})) {
           return value;
